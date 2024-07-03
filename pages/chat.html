@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div id="chat-board">
+        
+    </div>
+    <input id = "message">
+    <button onclick="send()">Send</button>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io('/');
+    const chat_id = localStorage.getItem('chat_id');
+
+    socket.emit('join-chat', chat_id);
+
+    // Creates new message div
+    const createMessageDiv = (message, classname) => {
+        var new_div = document.createElement('div');
+        new_div.classList.add(classname);
+        new_div.innerText = message;
+        return new_div;
+    };
+
+    // receive message 
+    socket.on('receive-message', message => {
+        document.getElementById("chat-board").append(createMessageDiv(message, "receive-message"));
+    });
+
+    // send message
+    const send = () => {
+        const message = document.getElementById("message").value;
+
+        socket.emit('send-message', message);
+
+        document.getElementById("chat-board").append(createMessageDiv(message, "sent-message"));
+    };
+
+</script>
+</html>
