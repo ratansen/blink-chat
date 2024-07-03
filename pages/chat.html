@@ -4,16 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        
+
     </style>
 </head>
 <body>
-    <div id="chat-board">
-        
+    <div class="artboard phone-1 p-5">
+        <div id="chat-board">
+            <div class="chat chat-start">
+                <div class="chat-bubble">
+                  
+                  <br />
+                  
+                </div>
+              </div>
+              <div class="chat chat-end">
+                <div class="chat-bubble chat-bubble-info">You underestimate my power!</div>
+              </div>
+        </div>
+
+        <textarea class="textarea textarea-info" placeholder="type" id="message"></textarea>
+        <button onclick="send()">Send</button>
     </div>
-    <input id = "message">
-    <button onclick="send()">Send</button>
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script>
