@@ -7,26 +7,46 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-
+        body{
+            padding: 0;
+        }
+        .screen{
+            width: 100vw;
+        }
+        .bottom-section{
+            display: flex;
+            justify-content: space-around;
+            position: fixed;
+            bottom: 10px;
+            gap: 5px;
+        }
+        .message-box{
+            width: 80vw;
+            white-space: pre-wrap;
+        }
+        .send-button{
+            display: flex;
+            background-color: #0F6993;
+            width: 50px;
+            border-radius: 10%;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
     </style>
 </head>
 <body>
-    <div class="artboard phone-1 p-5">
+    <div class="screen p-2">
         <div id="chat-board">
-            <div class="chat chat-start">
-                <div class="chat-bubble">
-                  
-                  <br />
-                  
-                </div>
-              </div>
-              <div class="chat chat-end">
-                <div class="chat-bubble chat-bubble-info">You underestimate my power!</div>
-              </div>
-        </div>
 
-        <textarea class="textarea textarea-info" placeholder="type" id="message"></textarea>
-        <button onclick="send()">Send</button>
+        </div>
+        <div class="bottom-section">
+            <textarea class="textarea textarea-info message-box" rows="1.5" placeholder="type message..." id="message"></textarea>
+            <button class="send-button" onclick="send()">
+                >
+            </button>
+        </div>
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
@@ -37,25 +57,30 @@
     socket.emit('join-chat', chat_id);
 
     // Creates new message div
-    const createMessageDiv = (message, classname) => {
-        var new_div = document.createElement('div');
-        new_div.classList.add(classname);
-        new_div.innerText = message;
-        return new_div;
+    const createChatBubble = (message, type) => {
+        var newBubble = `
+            <div class="chat ${type === 'received' ? "chat-start" : "chat-end"}">
+                <div class="chat-bubble ${type === "sent" ? "chat-bubble-info" : ""}">
+                  ${message}
+                </div>
+            </div>
+        `;
+        return newBubble;
     };
 
     // receive message 
     socket.on('receive-message', message => {
-        document.getElementById("chat-board").append(createMessageDiv(message, "receive-message"));
+        document.getElementById("chat-board").innerHTML += createChatBubble(message, 'received');
     });
 
     // send message
     const send = () => {
         const message = document.getElementById("message").value;
+        document.getElementById("message").value = "";
 
         socket.emit('send-message', message);
 
-        document.getElementById("chat-board").append(createMessageDiv(message, "sent-message"));
+        document.getElementById("chat-board").innerHTML += createChatBubble(message, 'sent');
     };
 
 </script>
