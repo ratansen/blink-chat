@@ -9,8 +9,19 @@ const io = new Server(server);
 const USER_LIMIT = 2;
 const userCounts: { [key: string]: number } = {};
 
+// const limitCheck = (req: { params: { id: string; }; }, res: { redirect: (arg0: string) => void; }, next: () => void) => {
+//     console.log(req.params.id);
+//     if(userCounts[req.params.id] >= 2){
+//         res.redirect('/');
+//     }
+//     else{
+//         next();
+//     }
+// };
+
 app.get("/", (req, res) => {
-    res.sendFile(__dirname + '/pages/index.html');
+    // res.sendFile(__dirname + '/pages/index.html');
+    res.redirect("/chat/default-chat")
 });
 
 app.get("/chat/:id", (req, res) =>{

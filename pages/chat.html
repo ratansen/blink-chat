@@ -7,22 +7,60 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Wittgenstein:ital,wght@0,400..900;1,400..900&display=swap');
+
+
         body{
             padding: 0;
+            font-family: 'Lato';
         }
         .screen{
             width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-section{
+            position: fixed;
+            top: 0;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 8vh;
+            width: 100vw;
+            text-align: center;
+            z-index: 1;
+            background: rgba(0,0,0,0.8);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+        #chat-board{
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            flex-grow: 1;
+            margin-bottom: 12vh;
+            margin-top: 8vh;
+            overflow-y: auto;
         }
         .bottom-section{
             display: flex;
             justify-content: space-around;
             position: fixed;
-            bottom: 10px;
+            bottom: 0px;
             gap: 5px;
+            background-color: #223843;
+            height: 10vh;
+            width: 100%;
         }
         .message-box{
             width: 80vw;
             white-space: pre-wrap;
+            border: none;
+            overflow: auto;
+            outline: none;
         }
         .send-button{
             display: flex;
@@ -34,14 +72,31 @@
             font-size: 1.5rem;
             font-weight: 900;
         }
+        .invite{
+            border: 2px solid #223843;
+            padding: 10px;
+            font-size: smaller;
+        }
+
     </style>
 </head>
 <body>
-    <div class="screen p-2">
-        <div id="chat-board">
+    <div class="screen">
+        <div class="top-section">
+            <div class="logo">
+                Blink
+            </div>
+            <div class="chat title">
 
+            </div>
+            <div class="right-pane">
+                <div class="invite" id="invite">Invite</div>
+            </div>
         </div>
-        <div class="bottom-section">
+        <div id="chat-board">
+            <!-- chats here -->
+        </div>
+        <div class="bottom-section p-2">
             <textarea class="textarea textarea-info message-box" rows="1.5" placeholder="type message..." id="message"></textarea>
             <button class="send-button" onclick="send()">
                 >
@@ -53,6 +108,8 @@
 <script>
     const socket = io('/');
     const chat_id = localStorage.getItem('chat_id');
+    const chatBoard = document.getElementById("chat-board");
+    const inviteButton = document.getElementById("invite");
 
     socket.emit('join-chat', chat_id);
 
@@ -70,18 +127,37 @@
 
     // receive message 
     socket.on('receive-message', message => {
-        document.getElementById("chat-board").innerHTML += createChatBubble(message, 'received');
+        chatBoard.innerHTML += createChatBubble(message, 'received');
+        chatBoard.scrollTop = chatBoard.scrollHeight;
     });
 
     // send message
     const send = () => {
-        const message = document.getElementById("message").value;
-        document.getElementById("message").value = "";
+        const messageObject = document.getElementById("message");
+        const message = messageObject.value.replace(/\n/g, "<br>");
 
+        messageObject.value = "";
         socket.emit('send-message', message);
 
-        document.getElementById("chat-board").innerHTML += createChatBubble(message, 'sent');
+        chatBoard.innerHTML += createChatBubble(message, 'sent');
+        chatBoard.scrollTop = chatBoard.scrollHeight;
+        messageObject.focus();
     };
+
+    // invite
+    inviteButton.addEventListener("click", (e) => {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Invite to Chat',
+                text: "Come let's chat. Click on the link to join the secure chat.",
+                url: window.location.href,
+            })
+            .then(() => console.log('Successful share'))
+            .catch((error) => console.log('Error sharing', error));
+        } else {
+            console.log('Share not supported on this browser, do it the old way.');
+        }
+    });
 
 </script>
 </html>
